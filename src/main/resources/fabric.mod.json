@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "growitems",
+  "version": "${version}",
+  "name": "Grow Items",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/growitems/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-datagen": [
+      "net.supergamer.growitems.client.GrowItemsDataGenerator"
+    ],
+    "client": [
+      "net.supergamer.growitems.client.GrowItemsClient"
+    ],
+    "main": [
+      "net.supergamer.growitems.GrowItems"
+    ]
+  },
+  "mixins": [
+    "growitems.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

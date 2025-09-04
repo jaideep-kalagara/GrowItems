@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ddd",
+    "sss",
+    "w w"
+  ],
+  "key": {
+    "d": [
+      "minecraft:dirt"
+    ],
+    "s": [
+      "stone"
+    ],
+    "w": "#minecraft:planks"
+  },
+  "result": {
+    "id": "growitems:item_grower",
+    "components": {}
+  }
+}
