@@ -1,0 +1,6 @@
+{
+  "item.growitems.item_grower": "Item Grower",
+  "text.growitems.item_grower_full": "Item grower is full!",
+  "text.growitems.item_grower_time_left": "Item grower time left: %1$s",
+  "text.growitems.item_grower_invalid_item": "Item grower invalid item!"
+}

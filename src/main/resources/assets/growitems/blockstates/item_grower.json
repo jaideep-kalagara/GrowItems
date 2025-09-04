@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "growitems:block/item_grower"
+    }
+  }
+}
