@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ItemGrowerBlockEntity extends BlockEntity implements ImplementedInventory {
 
-    private final DefaultedList<ItemStack> items = ImplementedInventory.ofSize(1).getItems();
+    private final DefaultedList<ItemStack> items = DefaultedList.ofSize(1, ItemStack.EMPTY);
     private int timer = 0;
     private int maxTimer = 0;
 

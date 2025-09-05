@@ -16,7 +16,6 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.ItemTags;
 
 import net.minecraft.util.collection.DefaultedList;
-import net.supergamer.growitems.GrowItems;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,8 +46,6 @@ public class ItemGrowerBlockGrowthTimings {
         int ticks = computeTicks(item);
         if (ticks <= 0) ticks = DEFAULT_TICKS;
         ITEM_TO_TICKS.put(item, Math.round(ticks * GLOBAL_SCALE));
-        String msg = "Computed growth time for " + item + " is " + ticks + " ticks";
-        GrowItems.LOGGER.info(msg);
     }
 
     public static void computeAll() {
@@ -78,15 +75,6 @@ public class ItemGrowerBlockGrowthTimings {
             return clamp(1200); // armor 1min should not get here because armor is crafted
         if (stack.get(DataComponentTypes.TOOL) != null) return clamp(1200); // tools 1 min
 
-        // ores
-        if (item.equals(Items.DIAMOND)) return clamp(9600);
-        if (item.equals(Items.EMERALD)) return clamp(3600);
-        if (item.equals(Items.GOLD_INGOT) || item.equals(Items.GOLD_NUGGET) || item.equals(Items.RAW_GOLD))
-            return clamp(4500);
-        if (item.equals(Items.IRON_INGOT) || item.equals(Items.IRON_NUGGET) || item.equals(Items.RAW_IRON))
-            return clamp(3600);
-        if (item.equals(Items.COAL)) return clamp(1200);
-        if (item.equals(Items.REDSTONE)) return clamp(1200);
 
         if (item instanceof BlockItem bi) {
             Block b = bi.getBlock();
@@ -148,7 +136,11 @@ public class ItemGrowerBlockGrowthTimings {
         if (recipe instanceof CraftingRecipe cr) {
             CraftingRecipeInput input = buildEmptyCraftingInput(cr);
             if (input != null) {
-                return cr.craft(input, LOOKUP);
+                try {
+                    return cr.craft(input, LOOKUP);
+                } catch (Throwable t) {
+                    return ItemStack.EMPTY;
+                }
             }
         }
 
