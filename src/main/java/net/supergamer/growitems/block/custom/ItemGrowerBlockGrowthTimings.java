@@ -17,6 +17,12 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import net.minecraft.util.collection.DefaultedList;
+import net.supergamer.growitems.GrowItems;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +37,7 @@ public class ItemGrowerBlockGrowthTimings {
     private static final int MAX_TICKS = 12000;     // 10m
     private static final int DEFAULT_TICKS = 240;   // 12s
 
-    public static float GLOBAL_SCALE = 1.0f; // Global scale for all item grower blocks so can be adjusted according to the difficulty
+    public static float GLOBAL_SCALE = 10.0f; // Global scale for all item grower blocks so can be adjusted according to the difficulty
 
     private static ServerRecipeManager RECIPES;
     private static RegistryWrapper.WrapperLookup LOOKUP;
@@ -46,6 +52,7 @@ public class ItemGrowerBlockGrowthTimings {
         int ticks = computeTicks(item);
         if (ticks <= 0) ticks = DEFAULT_TICKS;
         ITEM_TO_TICKS.put(item, Math.round(ticks * GLOBAL_SCALE));
+        GrowItems.LOGGER.info("Computed growth time for " + item + " is " + ticks + " ticks");
     }
 
     public static void computeAll() {
@@ -95,7 +102,6 @@ public class ItemGrowerBlockGrowthTimings {
     }
 
 
-
     private static int recipeCost(Item item) {
         if (RECIPES == null || LOOKUP == null) return -1;
 
@@ -104,26 +110,24 @@ public class ItemGrowerBlockGrowthTimings {
             Recipe<?> recipe = entry.value();
             RegistryKey<Recipe<?>> id = entry.id();
 
-            ItemStack out = recipe./*function here*/;
+            ItemStack out = getRecipeOutput(recipe);
 
             if (out.isEmpty() || out.getItem() != item) continue;
 
-            int cost;
+            int cost = switch (recipe) {
+                case CraftingRecipe cr -> ingredientCost(cr.getIngredientPlacement().getIngredients());
+                case AbstractCookingRecipe cook ->
+                    // input(1) + cook time with a sensible floor
+                        1 + Math.max(100, cook.getCookingTime());
+                case StonecuttingRecipe stonecuttingRecipe -> 40;
+                case SmithingTransformRecipe smithingTransformRecipe -> 220; // upgrade step
 
-            if (recipe instanceof CraftingRecipe cr) {
-                cost = ingredientCost(cr.getIngredientPlacement().getIngredients());
-            } else if (recipe instanceof AbstractCookingRecipe cook) {
-                // input(1) + cook time (vanilla ~200) with a sensible floor
-                cost = 1 + Math.max(100, cook.getCookingTime());
-            } else if (recipe instanceof StonecuttingRecipe) {
-                cost = 40;
-            } else if (recipe instanceof SmithingTransformRecipe) {
-                cost = 220; // upgrade step
-            } else if (recipe instanceof SmithingTrimRecipe) {
-                cost = 140; // cosmetic, cheaper
-            } else {
-                cost = 120; // generic fallback for other types
-            }
+                case SmithingTrimRecipe smithingTrimRecipe -> 140; // cosmetic, cheaper
+
+                default -> 120; // generic fallback for other types
+
+            };
+
             if (cost < bestCost) bestCost = cost;
         }
 
@@ -133,6 +137,46 @@ public class ItemGrowerBlockGrowthTimings {
         return clamp(ticks);
     }
 
+
+    private static ItemStack getRecipeOutput(Recipe<?> recipe) {
+        // Prefer crafting the output for crafting recipes to avoid mapping differences
+        if (recipe instanceof CraftingRecipe cr) {
+            CraftingRecipeInput input = buildEmptyCraftingInput(cr);
+            if (input != null) {
+                try {
+                    return cr.craft(input, LOOKUP);
+                } catch (Throwable ignored) {
+                    // fall through to reflection-based preview methods
+                }
+            }
+        }
+
+        // As a last resort, return empty. We only need the preview to filter matching recipes.
+        return ItemStack.EMPTY;
+    }
+
+    private static CraftingRecipeInput buildEmptyCraftingInput(CraftingRecipe recipe) {
+        int width = 3;
+        int height = 3;
+        try {
+            // Prefer exact dimensions if available (ShapedRecipe)
+            if (recipe instanceof ShapedRecipe sr) {
+                width = sr.getWidth();
+                height = sr.getHeight();
+            } else {
+                // For shapeless, default to 3x3 grid
+                width = 3;
+                height = 3;
+            }
+
+            DefaultedList<ItemStack> grid = DefaultedList.ofSize(width * height, ItemStack.EMPTY);
+
+            // Try static factory: CraftingRecipeInput.create(int, int, DefaultedList<ItemStack>)
+            return CraftingRecipeInput.create(width, height, grid);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
 
     private static int ingredientCost(List<Ingredient> ings) {
         int c = 0;
