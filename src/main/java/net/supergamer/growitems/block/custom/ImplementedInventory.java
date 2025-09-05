@@ -9,14 +9,6 @@ import net.minecraft.util.collection.DefaultedList;
 public interface ImplementedInventory extends Inventory {
     DefaultedList<ItemStack> getItems();
 
-    static ImplementedInventory of(DefaultedList<ItemStack> items) {
-        return () -> items;
-    }
-
-    static ImplementedInventory ofSize(int size) {
-        return of(DefaultedList.ofSize(size, ItemStack.EMPTY));
-    }
-
 
     @Override
     default int size() {
