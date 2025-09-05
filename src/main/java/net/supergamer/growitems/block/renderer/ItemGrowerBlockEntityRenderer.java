@@ -1,7 +1,6 @@
 package net.supergamer.growitems.block.renderer;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -20,19 +19,15 @@ import net.supergamer.growitems.block.custom.ItemGrowerBlockEntity;
 
 public class ItemGrowerBlockEntityRenderer implements BlockEntityRenderer<ItemGrowerBlockEntity> {
 
-    public ItemGrowerBlockEntityRenderer(BlockEntityRendererFactory.Context context) {
+    public ItemGrowerBlockEntityRenderer(BlockEntityRendererFactory.Context ignored) {
 
     }
 
     @Override
     public void render(ItemGrowerBlockEntity entity, float tickProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, Vec3d cameraPos) {
-        var mc = MinecraftClient.getInstance();
         ItemRenderer itemRenderer = MinecraftClient.getInstance().getItemRenderer();
-        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
 
         ItemStack stack = entity.getStack(0);
-        String text = entity.getTimeFormatted();
-        float textWidth = textRenderer.getWidth(text);
 
         matrices.push();
         matrices.translate(0.5, 0.8, 0.5);

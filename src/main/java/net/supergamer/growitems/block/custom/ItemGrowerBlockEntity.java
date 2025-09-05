@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ItemGrowerBlockEntity extends BlockEntity implements ImplementedInventory {
 
-    private final DefaultedList<ItemStack> items = DefaultedList.ofSize(1, ItemStack.EMPTY);
+    private final DefaultedList<ItemStack> items = ImplementedInventory.ofSize(1).getItems();
     private int timer = 0;
     private int maxTimer = 0;
 
@@ -111,7 +111,7 @@ public class ItemGrowerBlockEntity extends BlockEntity implements ImplementedInv
         }
     }
 
-    public static void tick(World world, BlockPos blockPos, BlockState blockState, ItemGrowerBlockEntity entity) {
+    public static void tick(World world, BlockPos blockPos, BlockState ignored, ItemGrowerBlockEntity entity) {
         if (entity.getStack(0).isEmpty()) return; // If the item grower is empty, do nothing
         if (entity.getTimer() > 0) { // If the timer is not 0, decrement it
             entity.setTimer(entity.getTimer() - 1);

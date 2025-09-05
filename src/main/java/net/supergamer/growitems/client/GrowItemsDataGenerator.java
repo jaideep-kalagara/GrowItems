@@ -7,6 +7,6 @@ public class GrowItemsDataGenerator implements DataGeneratorEntrypoint {
 
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
-        FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
+        FabricDataGenerator.Pack ignored = fabricDataGenerator.createPack();
     }
 }

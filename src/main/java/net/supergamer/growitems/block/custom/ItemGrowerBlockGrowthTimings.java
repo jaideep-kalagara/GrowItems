@@ -11,14 +11,9 @@ import net.minecraft.item.Items;
 import net.minecraft.recipe.*;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.util.Identifier;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import net.minecraft.util.collection.DefaultedList;
 import net.supergamer.growitems.GrowItems;
@@ -52,7 +47,8 @@ public class ItemGrowerBlockGrowthTimings {
         int ticks = computeTicks(item);
         if (ticks <= 0) ticks = DEFAULT_TICKS;
         ITEM_TO_TICKS.put(item, Math.round(ticks * GLOBAL_SCALE));
-        GrowItems.LOGGER.info("Computed growth time for " + item + " is " + ticks + " ticks");
+        String msg = "Computed growth time for " + item + " is " + ticks + " ticks";
+        GrowItems.LOGGER.info(msg);
     }
 
     public static void computeAll() {
@@ -85,8 +81,10 @@ public class ItemGrowerBlockGrowthTimings {
         // ores
         if (item.equals(Items.DIAMOND)) return clamp(9600);
         if (item.equals(Items.EMERALD)) return clamp(3600);
-        if (item.equals(Items.GOLD_INGOT) || item.equals(Items.GOLD_NUGGET) || item.equals(Items.RAW_GOLD)) return clamp(4500);
-        if (item.equals(Items.IRON_INGOT) || item.equals(Items.IRON_NUGGET) || item.equals(Items.RAW_IRON)) return clamp(3600);
+        if (item.equals(Items.GOLD_INGOT) || item.equals(Items.GOLD_NUGGET) || item.equals(Items.RAW_GOLD))
+            return clamp(4500);
+        if (item.equals(Items.IRON_INGOT) || item.equals(Items.IRON_NUGGET) || item.equals(Items.RAW_IRON))
+            return clamp(3600);
         if (item.equals(Items.COAL)) return clamp(1200);
         if (item.equals(Items.REDSTONE)) return clamp(1200);
 
@@ -116,7 +114,6 @@ public class ItemGrowerBlockGrowthTimings {
         int bestCost = Integer.MAX_VALUE;
         for (RecipeEntry<?> entry : RECIPES.values()) {
             Recipe<?> recipe = entry.value();
-            RegistryKey<Recipe<?>> id = entry.id();
 
             ItemStack out = getRecipeOutput(recipe);
 
@@ -127,10 +124,10 @@ public class ItemGrowerBlockGrowthTimings {
                 case AbstractCookingRecipe cook ->
                     // input(1) + cook time with a sensible floor
                         1 + Math.max(100, cook.getCookingTime());
-                case StonecuttingRecipe stonecuttingRecipe -> 40;
-                case SmithingTransformRecipe smithingTransformRecipe -> 220; // upgrade step
+                case StonecuttingRecipe ignored -> 40;
+                case SmithingTransformRecipe ignored -> 220; // upgrade step
 
-                case SmithingTrimRecipe smithingTrimRecipe -> 3200; // cosmetic, cheaper
+                case SmithingTrimRecipe ignored -> 3200; // cosmetic, cheaper
 
                 default -> 120; // generic fallback for other types
 
@@ -151,11 +148,7 @@ public class ItemGrowerBlockGrowthTimings {
         if (recipe instanceof CraftingRecipe cr) {
             CraftingRecipeInput input = buildEmptyCraftingInput(cr);
             if (input != null) {
-                try {
-                    return cr.craft(input, LOOKUP);
-                } catch (Throwable ignored) {
-                    // fall through to reflection-based preview methods
-                }
+                return cr.craft(input, LOOKUP);
             }
         }
 
@@ -171,10 +164,6 @@ public class ItemGrowerBlockGrowthTimings {
             if (recipe instanceof ShapedRecipe sr) {
                 width = sr.getWidth();
                 height = sr.getHeight();
-            } else {
-                // For shapeless, default to 3x3 grid
-                width = 3;
-                height = 3;
             }
 
             DefaultedList<ItemStack> grid = DefaultedList.ofSize(width * height, ItemStack.EMPTY);
@@ -186,9 +175,9 @@ public class ItemGrowerBlockGrowthTimings {
         }
     }
 
-    private static int ingredientCost(List<Ingredient> ings) {
+    private static int ingredientCost(List<Ingredient> ingredients) {
         int c = 0;
-        for (Ingredient ing : ings) if (!ing.isEmpty()) c++;
+        for (Ingredient ing : ingredients) if (!ing.isEmpty()) c++;
         return Math.max(1, c);
     }
 

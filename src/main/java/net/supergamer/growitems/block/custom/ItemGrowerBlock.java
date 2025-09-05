@@ -7,7 +7,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -17,8 +16,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.supergamer.growitems.block.ModBlockEntities;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
 
 import static net.supergamer.growitems.block.custom.ItemGrowerBlockGrowthTimings.ITEM_TO_TICKS;
 
