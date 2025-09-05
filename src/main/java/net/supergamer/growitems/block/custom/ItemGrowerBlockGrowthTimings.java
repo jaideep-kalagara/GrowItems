@@ -82,6 +82,14 @@ public class ItemGrowerBlockGrowthTimings {
             return clamp(1200); // armor 1min should not get here because armor is crafted
         if (stack.get(DataComponentTypes.TOOL) != null) return clamp(1200); // tools 1 min
 
+        // ores
+        if (item.equals(Items.DIAMOND)) return clamp(9600);
+        if (item.equals(Items.EMERALD)) return clamp(3600);
+        if (item.equals(Items.GOLD_INGOT) || item.equals(Items.GOLD_NUGGET) || item.equals(Items.RAW_GOLD)) return clamp(4500);
+        if (item.equals(Items.IRON_INGOT) || item.equals(Items.IRON_NUGGET) || item.equals(Items.RAW_IRON)) return clamp(3600);
+        if (item.equals(Items.COAL)) return clamp(1200);
+        if (item.equals(Items.REDSTONE)) return clamp(1200);
+
         if (item instanceof BlockItem bi) {
             Block b = bi.getBlock();
             BlockState st = b.getDefaultState();
@@ -122,7 +130,7 @@ public class ItemGrowerBlockGrowthTimings {
                 case StonecuttingRecipe stonecuttingRecipe -> 40;
                 case SmithingTransformRecipe smithingTransformRecipe -> 220; // upgrade step
 
-                case SmithingTrimRecipe smithingTrimRecipe -> 140; // cosmetic, cheaper
+                case SmithingTrimRecipe smithingTrimRecipe -> 3200; // cosmetic, cheaper
 
                 default -> 120; // generic fallback for other types
 
